@@ -42,7 +42,7 @@ for material in materials:
     data['std']=datastd/dataMean
     # data['gmean'] =dataMean
 
-    data.to_csv("ave.csv")
+    data.to_csv(material+"_ave.csv")
 
     correct="../finaltest/EvaluationKit/EvaluationKit/Measured_"+material
     # print(correct)
@@ -76,7 +76,7 @@ for material in materials:
         rejectThreshold=[]
         for RejectionRatio in range(1,99):  # percentage of data select by std across models
             reject=np.percentile(data['std'].values,RejectionRatio)
-            # Select a subset of the data 
+            # Select a subset of the data  
             dataccopy= datac[data['std'].values>reject]
             datacopy=data[data['std'].values>reject]
 
