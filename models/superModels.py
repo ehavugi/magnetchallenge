@@ -66,6 +66,8 @@ for material in materials:
     factor = "gmean"
     factors = [x  for x in list(data.columns) if x in schools]
     factors.append("gmean")
+    plt.figure()
+
     for factor in factors:
         n = len(data)
 
@@ -87,12 +89,17 @@ for material in materials:
             rejectThreshold.append(reject)
             # print(len(data)/n*100, "%","remaining")
 
-        plt.figure()
         plt.plot(rejectThreshold,percentileErrors)
-        plt.title(f"95th Percentile Errors(%) vs rejection threshold\n normalized std error(%) {material}")
+        plt.yscale('log')
 
-        plt.ylabel("95th percentile Error(%)")
-        plt.xlabel("coefficient of variation(%)")
-        plt.savefig(factor+"_"+material+".png")
-# plt.show()
+    plt.title(f"95th Percentile Errors(%) vs rejection threshold\n normalized std error(%) {material}")
+    plt.plot(rejectThreshold,rejectThreshold)
+    plt.ylabel("95th percentile Error(%)")
+    plt.xlabel("coefficient of variation(%)")
+    x=factors.copy()
+    x.append("coefficient of variation")
+    plt.legend(x)
+        # plt.savefig(factor+"_"+material+".png")
+    plt.grid(which="both")
 
+    plt.savefig(material+".png")
