@@ -26,7 +26,9 @@ for material in materials:
                 # print("Datai", datai.describe())
                 data[school]=np.abs(datai.values.reshape(-1))
                 # print("data", data.describe())
+
     data=pd.DataFrame.from_dict(data)
+    del data["Mondragon"]
     print(data.columns)
     # Select university to use in the modeling of std correlation with percentile errors
     # uncomment selection to disable selection 
@@ -84,22 +86,26 @@ for material in materials:
 
             datacopy['error']=np.abs(datacopy[factor].values.reshape(-1)-dataccopy.values.reshape(-1))/dataccopy.values.reshape(-1)
             # print(len(datacopy))
-            percentileErrors.append(np.percentile(datacopy['error'],95))
-            percentileRejectionRatio.append(RejectionRatio)
-            rejectThreshold.append(reject)
+            percentileErrors.append(np.percentile(datacopy['error'],95)*100)
+            percentileRejectionRatio.append(RejectionRatio*100)
+            rejectThreshold.append(reject*100)
             # print(len(data)/n*100, "%","remaining")
+        if factor == "gmean":
+            plt.plot(rejectThreshold,percentileErrors,"+-")
+        else:
+            plt.plot(rejectThreshold,percentileErrors)
 
-        plt.plot(rejectThreshold,percentileErrors)
         plt.yscale('log')
 
     plt.title(f"95th Percentile Errors(%) vs rejection threshold\n normalized std error(%) {material}")
-    plt.plot(rejectThreshold,rejectThreshold)
+    plt.plot(rejectThreshold,rejectThreshold,"*-")
     plt.ylabel("95th percentile Error(%)")
     plt.xlabel("coefficient of variation(%)")
     x=factors.copy()
     x.append("coefficient of variation")
-    plt.legend(x)
+    plt.legend(x,loc='center left')
         # plt.savefig(factor+"_"+material+".png")
     plt.grid(which="both")
+    plt.tight_layout()
 
     plt.savefig(material+".png")
