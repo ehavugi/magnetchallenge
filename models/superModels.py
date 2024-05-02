@@ -24,8 +24,11 @@ for material in materials:
                 datai=  pd.read_csv(f"{path}/{school}/Result/{material}",header=None)
                 schools.append(school)
                 # print("Datai", datai.describe())
+                print("school data" , matpath)
                 data[school]=np.abs(datai.values.reshape(-1))
                 # print("data", data.describe())
+            else:
+                print(f"{school} not found", matpath)
 
     data=pd.DataFrame.from_dict(data)
     del data["Mondragon"]
@@ -51,23 +54,34 @@ for material in materials:
     datac = pd.read_csv(correct,header=None)
     print("school, median error, 95 th percentile,99 percentile,99.9 percentile")
 
-    for each in ['ASU', 'KU Leuven', 'Mondragon', 'NTUT', 'Paderborn', 'PoliTO', 'Sydney', 'Tribhuvan', 'Tsinghua', 'TUDelft', 'UTK', 'XJTU']:
+    for each in schools:
         if each in data.columns:
             data['error']=np.abs(data[each].values.reshape(-1)-datac.values.reshape(-1))/datac.values.reshape(-1)
             print(each, np.percentile(data['error'],50),np.percentile(data['error'],95),np.percentile(data['error'],99),np.percentile(data['error'],99.9))
 
-    data['error']=np.abs(data["gmean"].values.reshape(-1)-datac.values.reshape(-1))/datac.values.reshape(-1)
+    data['error']=np.abs(data["Paderborn"].values.reshape(-1)-datac.values.reshape(-1))/datac.values.reshape(-1)
     print("gmean", np.percentile(data['error'],50),np.percentile(data['error'],95),np.percentile(data['error'],99),np.percentile(data['error'],99.9))
 
+    plt.figure()
 
-    # plt.plot(data['std'],data['error'],"*")
-    # plt.ylabel("Error(%)")
-    # plt.xlabel("standard deviation")
+    plt.plot(data['std'],data['error'],"*")
+    plt.ylabel("Error(%)")
+    plt.xlabel("standard deviation")
+    plt.savefig(f"{material}_cv.png")
+    plt.figure()
     print(np.corrcoef(data['std'],data['error']))
+    datax= data.copy(True)
+    datax = datax-data['gmean']
+    # corr = datax.cov()
+    # print(corr)
+    # corr.style.background_gradient(cmap='coolwarm')
+    # print(datax.corr())
+    # plt.show()
    
     factor = "gmean"
     factors = [x  for x in list(data.columns) if x in schools]
     factors.append("gmean")
+    print("Hi htere")
     plt.figure()
 
     for factor in factors:
@@ -81,14 +95,16 @@ for material in materials:
         for RejectionRatio in range(1,99):  # percentage of data select by std across models
             reject=np.percentile(data['std'].values,RejectionRatio)
             # Select a subset of the data  
-            dataccopy= datac[data['std'].values>reject]
-            datacopy=data[data['std'].values>reject]
+            dataccopy= datac[data['std'].values<=reject]
+            datacopy=data[data['std'].values<=reject]
 
             datacopy['error']=np.abs(datacopy[factor].values.reshape(-1)-dataccopy.values.reshape(-1))/dataccopy.values.reshape(-1)
             # print(len(datacopy))
             percentileErrors.append(np.percentile(datacopy['error'],95)*100)
+            # percentileErrors.append(np.max(datacopy['error'])*100)
+
             percentileRejectionRatio.append(RejectionRatio*100)
-            rejectThreshold.append(reject*100)
+            rejectThreshold.append(datacopy['std'].mean()*100)
             # print(len(data)/n*100, "%","remaining")
         if factor == "gmean":
             plt.plot(rejectThreshold,percentileErrors,"+-")
@@ -100,7 +116,7 @@ for material in materials:
     plt.title(f"95th Percentile Errors(%) vs rejection threshold\n normalized std error(%) {material}")
     plt.plot(rejectThreshold,rejectThreshold,"*-")
     plt.ylabel("95th percentile Error(%)")
-    plt.xlabel("coefficient of variation(%)")
+    plt.xlabel("mean (subset) coefficient of variation(%)")
     x=factors.copy()
     x.append("coefficient of variation")
     plt.legend(x,loc='center left')
@@ -108,4 +124,5 @@ for material in materials:
     plt.grid(which="both")
     plt.tight_layout()
 
-    plt.savefig(material+".png")
+    # plt.savefig(material+".png")
+    plt.savefig(material+".pdf", format="pdf", bbox_inches="tight")
