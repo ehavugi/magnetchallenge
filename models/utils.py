@@ -45,7 +45,7 @@ for material in "ABCDE":
     for i in range(1000):
 
         A, B, datacorrect= cv_data(material,i)
-        plt.figure()
+        # plt.figure()
         cv= np.std(A)/np.mean(A)*100
         fig, ax1 = plt.subplots()
 
@@ -96,6 +96,7 @@ for material in "ABCDE":
         # plt.show()
         plt.cla()
         plt.clf()
+    
       
 
         plt.close()
