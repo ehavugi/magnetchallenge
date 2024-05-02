@@ -51,7 +51,7 @@ for material in "ABCDE":
 
         color = 'tab:red'
         # ax1.set_xlabel('time (s)')
-        ax1.set_ylabel('# model outputs', color=color)
+        ax1.set_ylabel('#Model outputs', color=color)
         # ax1.plot(t, data1, color=color)
         ax1.tick_params(axis='y', labelcolor=color)
 
@@ -80,15 +80,16 @@ for material in "ABCDE":
 
         Anormalmax= np.max(Anormal)
         ax2.plot(x_axis, Anormal/Anormalmax,"--")
-        ax2.set_ylabel("probability")
-        ax1.legend(['mean value', "true value", "right=mean+2sigma/sqrt(N)","left=mean-2sigma/sqrt(N)","histogram","Normal dist"])
+        ax2.set_ylabel("Probability")
+        ax1.legend(['Mean value', "True value", "Right=mean+2sigma/sqrt(N)","Left=mean-2sigma/sqrt(N)","Histogram","Normal dist"])
 
         # ax2.legend(["Analytic normal dist"])
 
+        ax1.set_xlabel("Core loss(W/m^3)")
 
 
 
-        plt.title(f"mean error: {float(B):0.1f}%, cv: {float(cv):0.1f}%, 2*cv/sqrt(#models) : {float(2*cv/np.sqrt(len(A))):0.1f} %")
+        plt.title(f"Mean error: {float(B):0.1f}%, cv: {float(cv):0.1f}%, 2*cv/sqrt(#models) : {float(2*cv/np.sqrt(len(A))):0.1f} %\n Material : {material}, data point index: {i+1}")
         # cv/sqrt(N) is inspired by confidence interval concept given N samples (1sigma-ish)
         plt.xlabel("Core loss(W/m^3)")
         plt.savefig(f"images/{material}/{i}.png")
